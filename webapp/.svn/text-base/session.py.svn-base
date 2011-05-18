@@ -1,0 +1,52 @@
+# This file is part of WebApp.
+# 
+# WebApp is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# WebApp is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with WebApp.  If not, see <http://www.gnu.org/licenses/>.
+
+__author__ = 'Samuel Cochran <sj26@sj26.com>'
+__version__ = '0.1'
+__copyright__ = 'Copyright 2008 Samuel Cochran'
+
+from paste.session import make_session_middleware
+
+from webapp.app import *
+from webapp.check import Check, environ_has
+
+Request.session = property(lambda self: self.environ['paste.session.factory']())
+
+def session_has(*args, **kwargs):
+    """
+    Check for the presense and, optionally, value of a session variable.
+
+    If value is a callable it will be passed (app, var, value), otherwise
+    it will be compared literally.
+    """
+    if len(args) > 1 or len(kwargs) > 1 or (len(args) and len(kwargs)) or (not len(args) and not len(kwargs)):
+        raise ValueError("Must provide one and only one session variable to test. Consider using session_has_any or session_has_all.")
+    elif len(args):
+        var = args[0]
+        return Check(lambda app: var in app.request.session)
+    else:
+        var, value = kwargs.items()[0]
+        return Check(lambda app: app.request.session.get(var) == value)
+
+def environ_has_any(*args, **kwargs):
+    return Check(lambda app: any(arg in app.request.session for arg in args) or any(app.request.session.get(key) == value for (key, value) in kwargs.iteritems()))
+
+def session_has_all(*args, **kwargs):
+    return Check(lambda app: all(arg in app.request.session for arg in args) and all(app.request.session.get(key) == value for (key, value) in kwargs.iteritems()))
+
+class Sessioned(object):
+    def __middleware_factory__(self, app):
+        return super(Sessioned, self).__middleware_factory__(make_session_middleware(app, {}))
+ 

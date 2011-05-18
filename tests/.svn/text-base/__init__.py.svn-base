@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+
+# This file is part of WebApp.
+# 
+# WebApp is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# WebApp is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with WebApp.  If not, see <http://www.gnu.org/licenses/>.
+
+__author__ = 'Samuel Cochran <sj26@sj26.com>'
+__version__ = '0.1'
+__copyright__ = 'Copyright 2008 Samuel Cochran'
+
+import sys, os, os.path
+from glob import iglob
+import unittest
+
+def suite():
+    ''' Load the WebApp test suite for running. '''
+    suite = unittest.TestSuite()
+    
+    for filename in iglob(os.path.join(os.path.os.path.dirname(__file__), '*.py')):
+        filename = os.path.basename(filename)
+        if filename == "__init__.py":
+            continue
+        unittest.defaultTestLoader.loadTestsFromModule(__import__('tests.'+filename[:-3]))
+    
+    return suite

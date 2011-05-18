@@ -1,0 +1,9 @@
+K 10
+svn:ignore
+V 28
+build
+dist
+*.pyc
+*.egg-info
+
+END

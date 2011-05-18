@@ -1,0 +1,2 @@
+ * Make check() perform the check for current environ if it's present, otherwise presume we're a decorator.
+ * Add from_host, from_any_host, from_network, from_any_network
